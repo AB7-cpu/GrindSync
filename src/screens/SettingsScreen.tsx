@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, TouchableOpacity, Alert } from 'react-native';
-import { Card, List, Divider, Avatar, Button, Dialog, Portal, TextInput } from 'react-native-paper';
+import { Card, List, Divider, Avatar, Button, Dialog, Portal, TextInput, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { updateUserProfile, updateUserPreferences } from '../store/slices/userSlice';
-import { colors, spacing, fontSizes } from '../utils/theme';
+import { spacing, fontSizes } from '../utils/theme';
 import { toggleDarkMode } from '../store/slices/settingsSlice';
 
 const SettingsScreen: React.FC = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
   const { profile, preferences } = useSelector((state: RootState) => state.user);
   const { darkMode } = useSelector((state: RootState) => state.settings);
+  const [localDarkMode, setLocalDarkMode] = useState(darkMode);
   
   // State for profile editing dialog
   const [showProfileDialog, setShowProfileDialog] = useState(false);
@@ -35,7 +37,17 @@ const SettingsScreen: React.FC = () => {
   
   // Handle toggling dark mode
   const handleToggleDarkMode = () => {
+    // Toggle dark mode in Redux
     dispatch(toggleDarkMode());
+    
+    // Also update local state for immediate feedback
+    setLocalDarkMode(!localDarkMode);
+    
+    // Force reload to apply theme changes
+    setTimeout(() => {
+      setShowProfileDialog(false); // Close any open dialogs
+      setShowGoalDialog(false);
+    }, 100);
   };
   
   // Handle toggling metric units
@@ -91,26 +103,26 @@ const SettingsScreen: React.FC = () => {
   };
   
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Text style={[styles.title, { color: theme.colors.onBackground }]}>Settings</Text>
       
       <ScrollView style={styles.scrollView}>
         {/* User Profile Section */}
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
             <View style={styles.profileHeader}>
               <Avatar.Text 
                 size={80} 
                 label={profile.name.substring(0, 2).toUpperCase()} 
                 color="white"
-                style={{ backgroundColor: colors.primary }}
+                style={{ backgroundColor: theme.colors.primary }}
               />
               <View style={styles.profileInfo}>
-                <Text style={styles.profileName}>{profile.name}</Text>
-                <Text style={styles.profileDetails}>
+                <Text style={[styles.profileName, { color: theme.colors.onSurface }]}>{profile.name}</Text>
+                <Text style={[styles.profileDetails, { color: theme.colors.onSurfaceVariant }]}>
                   {profile.age} years, {profile.gender.charAt(0).toUpperCase() + profile.gender.slice(1)}
                 </Text>
-                <Text style={styles.profileDetails}>
+                <Text style={[styles.profileDetails, { color: theme.colors.onSurfaceVariant }]}>
                   {useMetric ? `${profile.height} cm, ${profile.weight} kg` : 
                     `${Math.round(profile.height / 2.54)} in, ${Math.round(profile.weight * 2.2046)} lbs`}
                 </Text>
@@ -120,7 +132,8 @@ const SettingsScreen: React.FC = () => {
             <Button 
               mode="outlined" 
               onPress={() => setShowProfileDialog(true)} 
-              style={styles.editButton}
+              style={[styles.editButton, { borderColor: theme.colors.primary }]}
+              textColor={theme.colors.primary}
             >
               Edit Profile
             </Button>
@@ -128,9 +141,9 @@ const SettingsScreen: React.FC = () => {
         </Card>
         
         {/* Fitness Goals */}
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Fitness Goal</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Fitness Goal</Text>
             <View style={styles.goalContainer}>
               <View style={styles.goalItem}>
                 <MaterialCommunityIcons 
@@ -139,9 +152,9 @@ const SettingsScreen: React.FC = () => {
                     goal === 'muscleGain' ? 'arm-flex' : 'run'
                   } 
                   size={24} 
-                  color={colors.primary} 
+                  color={theme.colors.primary} 
                 />
-                <Text style={styles.goalText}>
+                <Text style={[styles.goalText, { color: theme.colors.onSurface }]}>
                   {goal === 'weightLoss' ? 'Weight Loss' : 
                    goal === 'muscleGain' ? 'Muscle Gain' : 
                    goal === 'endurance' ? 'Endurance' : 'General Fitness'}
@@ -150,7 +163,7 @@ const SettingsScreen: React.FC = () => {
               <Button 
                 mode="text" 
                 onPress={() => setShowGoalDialog(true)}
-                labelStyle={{ color: colors.primary }}
+                textColor={theme.colors.primary}
               >
                 Change
               </Button>
@@ -159,37 +172,43 @@ const SettingsScreen: React.FC = () => {
         </Card>
         
         {/* App Preferences */}
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>App Preferences</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>App Preferences</Text>
             
             <List.Item
               title="Dark Mode"
               description="Enable dark mode for the app"
-              left={props => <List.Icon {...props} icon="theme-light-dark" />}
-              right={props => <Switch value={darkMode} onValueChange={handleToggleDarkMode} />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              left={props => <List.Icon {...props} icon="theme-light-dark" color={theme.colors.primary} />}
+              right={props => <Switch value={localDarkMode} onValueChange={handleToggleDarkMode} />}
             />
             
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             
             <List.Item
               title="Use Metric System"
               description="Switch between metric and imperial units"
-              left={props => <List.Icon {...props} icon="ruler" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              left={props => <List.Icon {...props} icon="ruler" color={theme.colors.primary} />}
               right={props => <Switch value={useMetric} onValueChange={handleToggleMetric} />}
             />
           </Card.Content>
         </Card>
         
         {/* Notification Settings */}
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Notifications</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Notifications</Text>
             
             <List.Item
               title="Workout Reminders"
               description="Get reminders for your scheduled workouts"
-              left={props => <List.Icon {...props} icon="dumbbell" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              left={props => <List.Icon {...props} icon="dumbbell" color={theme.colors.primary} />}
               right={props => 
                 <Switch 
                   value={enableWorkoutReminders} 
@@ -198,12 +217,14 @@ const SettingsScreen: React.FC = () => {
               }
             />
             
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             
             <List.Item
               title="Nutrition Reminders"
               description="Get reminders to log your meals"
-              left={props => <List.Icon {...props} icon="food-apple" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              left={props => <List.Icon {...props} icon="food-apple" color={theme.colors.primary} />}
               right={props => 
                 <Switch 
                   value={enableNutritionReminders} 
@@ -212,12 +233,14 @@ const SettingsScreen: React.FC = () => {
               }
             />
             
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             
             <List.Item
               title="Progress Updates"
               description="Receive updates about your fitness progress"
-              left={props => <List.Icon {...props} icon="chart-line" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              left={props => <List.Icon {...props} icon="chart-line" color={theme.colors.primary} />}
               right={props => 
                 <Switch 
                   value={enableProgressUpdates} 
@@ -229,38 +252,43 @@ const SettingsScreen: React.FC = () => {
         </Card>
         
         {/* About & Support */}
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>About & Support</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>About & Support</Text>
             
             <List.Item
               title="Privacy Policy"
-              left={props => <List.Icon {...props} icon="shield-account" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              left={props => <List.Icon {...props} icon="shield-account" color={theme.colors.primary} />}
               onPress={() => {/* Navigate to privacy policy */}}
             />
             
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             
             <List.Item
               title="Terms of Service"
-              left={props => <List.Icon {...props} icon="file-document" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              left={props => <List.Icon {...props} icon="file-document" color={theme.colors.primary} />}
               onPress={() => {/* Navigate to terms of service */}}
             />
             
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             
             <List.Item
               title="Contact Support"
-              left={props => <List.Icon {...props} icon="help-circle" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              left={props => <List.Icon {...props} icon="help-circle" color={theme.colors.primary} />}
               onPress={() => {/* Open support contact options */}}
             />
             
-            <Divider style={styles.divider} />
+            <Divider style={[styles.divider, { backgroundColor: theme.colors.outline }]} />
             
             <List.Item
               title="App Version"
               description="1.0.0"
-              left={props => <List.Icon {...props} icon="information" />}
+              titleStyle={{ color: theme.colors.onSurface }}
+              descriptionStyle={{ color: theme.colors.onSurfaceVariant }}
+              left={props => <List.Icon {...props} icon="information" color={theme.colors.primary} />}
             />
           </Card.Content>
         </Card>
@@ -268,8 +296,8 @@ const SettingsScreen: React.FC = () => {
         <Button 
           mode="outlined" 
           onPress={() => {/* Handle logout */}} 
-          style={styles.logoutButton}
-          textColor={colors.error}
+          style={[styles.logoutButton, { borderColor: theme.colors.error }]}
+          textColor={theme.colors.error}
         >
           Log Out
         </Button>
@@ -311,24 +339,27 @@ const SettingsScreen: React.FC = () => {
               style={styles.dialogInput}
             />
             
-            <Text style={styles.dialogLabel}>Gender</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Gender</Text>
             <View style={styles.genderButtons}>
               <TouchableOpacity
                 style={[
                   styles.genderButton,
-                  gender === 'male' && styles.genderButtonSelected
+                  { borderColor: theme.colors.outline },
+                  gender === 'male' && [styles.genderButtonSelected, 
+                    { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '10' }]
                 ]}
                 onPress={() => setGender('male')}
               >
                 <MaterialCommunityIcons
                   name="gender-male"
                   size={24}
-                  color={gender === 'male' ? colors.primary : colors.textSecondary}
+                  color={gender === 'male' ? theme.colors.primary : theme.colors.onSurfaceVariant}
                 />
                 <Text
                   style={[
                     styles.genderButtonText,
-                    gender === 'male' && styles.genderButtonTextSelected
+                    { color: theme.colors.onSurfaceVariant },
+                    gender === 'male' && [styles.genderButtonTextSelected, { color: theme.colors.primary }]
                   ]}
                 >
                   Male
@@ -338,19 +369,22 @@ const SettingsScreen: React.FC = () => {
               <TouchableOpacity
                 style={[
                   styles.genderButton,
-                  gender === 'female' && styles.genderButtonSelected
+                  { borderColor: theme.colors.outline },
+                  gender === 'female' && [styles.genderButtonSelected, 
+                    { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '10' }]
                 ]}
                 onPress={() => setGender('female')}
               >
                 <MaterialCommunityIcons
                   name="gender-female"
                   size={24}
-                  color={gender === 'female' ? colors.primary : colors.textSecondary}
+                  color={gender === 'female' ? theme.colors.primary : theme.colors.onSurfaceVariant}
                 />
                 <Text
                   style={[
                     styles.genderButtonText,
-                    gender === 'female' && styles.genderButtonTextSelected
+                    { color: theme.colors.onSurfaceVariant },
+                    gender === 'female' && [styles.genderButtonTextSelected, { color: theme.colors.primary }]
                   ]}
                 >
                   Female
@@ -360,19 +394,22 @@ const SettingsScreen: React.FC = () => {
               <TouchableOpacity
                 style={[
                   styles.genderButton,
-                  gender === 'other' && styles.genderButtonSelected
+                  { borderColor: theme.colors.outline },
+                  gender === 'other' && [styles.genderButtonSelected, 
+                    { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '10' }]
                 ]}
                 onPress={() => setGender('other')}
               >
                 <MaterialCommunityIcons
                   name="gender-non-binary"
                   size={24}
-                  color={gender === 'other' ? colors.primary : colors.textSecondary}
+                  color={gender === 'other' ? theme.colors.primary : theme.colors.onSurfaceVariant}
                 />
                 <Text
                   style={[
                     styles.genderButtonText,
-                    gender === 'other' && styles.genderButtonTextSelected
+                    { color: theme.colors.onSurfaceVariant },
+                    gender === 'other' && [styles.genderButtonTextSelected, { color: theme.colors.primary }]
                   ]}
                 >
                   Other
@@ -381,8 +418,8 @@ const SettingsScreen: React.FC = () => {
             </View>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowProfileDialog(false)}>Cancel</Button>
-            <Button onPress={handleUpdateProfile}>Save</Button>
+            <Button onPress={() => setShowProfileDialog(false)} textColor={theme.colors.onSurface}>Cancel</Button>
+            <Button onPress={handleUpdateProfile} textColor={theme.colors.primary}>Save</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -395,78 +432,86 @@ const SettingsScreen: React.FC = () => {
             <TouchableOpacity
               style={[
                 styles.goalOption,
-                goal === 'weightLoss' && styles.goalOptionSelected
+                { borderColor: theme.colors.outline },
+                goal === 'weightLoss' && [styles.goalOptionSelected, 
+                  { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '10' }]
               ]}
               onPress={() => setGoal('weightLoss')}
             >
               <MaterialCommunityIcons
                 name="scale-bathroom"
                 size={24}
-                color={goal === 'weightLoss' ? colors.primary : colors.textSecondary}
+                color={goal === 'weightLoss' ? theme.colors.primary : theme.colors.onSurfaceVariant}
               />
               <View style={styles.goalOptionText}>
-                <Text style={styles.goalOptionTitle}>Weight Loss</Text>
-                <Text style={styles.goalOptionDescription}>Focus on losing weight and burning fat</Text>
+                <Text style={[styles.goalOptionTitle, { color: theme.colors.onSurface }]}>Weight Loss</Text>
+                <Text style={[styles.goalOptionDescription, { color: theme.colors.onSurfaceVariant }]}>Focus on losing weight and burning fat</Text>
               </View>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={[
                 styles.goalOption,
-                goal === 'muscleGain' && styles.goalOptionSelected
+                { borderColor: theme.colors.outline },
+                goal === 'muscleGain' && [styles.goalOptionSelected, 
+                  { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '10' }]
               ]}
               onPress={() => setGoal('muscleGain')}
             >
               <MaterialCommunityIcons
                 name="arm-flex"
                 size={24}
-                color={goal === 'muscleGain' ? colors.primary : colors.textSecondary}
+                color={goal === 'muscleGain' ? theme.colors.primary : theme.colors.onSurfaceVariant}
               />
               <View style={styles.goalOptionText}>
-                <Text style={styles.goalOptionTitle}>Muscle Gain</Text>
-                <Text style={styles.goalOptionDescription}>Focus on building muscle and strength</Text>
+                <Text style={[styles.goalOptionTitle, { color: theme.colors.onSurface }]}>Muscle Gain</Text>
+                <Text style={[styles.goalOptionDescription, { color: theme.colors.onSurfaceVariant }]}>Focus on building muscle and strength</Text>
               </View>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={[
                 styles.goalOption,
-                goal === 'endurance' && styles.goalOptionSelected
+                { borderColor: theme.colors.outline },
+                goal === 'endurance' && [styles.goalOptionSelected, 
+                  { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '10' }]
               ]}
               onPress={() => setGoal('endurance')}
             >
               <MaterialCommunityIcons
                 name="run"
                 size={24}
-                color={goal === 'endurance' ? colors.primary : colors.textSecondary}
+                color={goal === 'endurance' ? theme.colors.primary : theme.colors.onSurfaceVariant}
               />
               <View style={styles.goalOptionText}>
-                <Text style={styles.goalOptionTitle}>Endurance</Text>
-                <Text style={styles.goalOptionDescription}>Focus on cardiovascular fitness and endurance</Text>
+                <Text style={[styles.goalOptionTitle, { color: theme.colors.onSurface }]}>Endurance</Text>
+                <Text style={[styles.goalOptionDescription, { color: theme.colors.onSurfaceVariant }]}>Focus on cardiovascular fitness and endurance</Text>
               </View>
             </TouchableOpacity>
             
             <TouchableOpacity
               style={[
                 styles.goalOption,
-                goal === 'general' && styles.goalOptionSelected
+                { borderColor: theme.colors.outline },
+                goal === 'general' && [styles.goalOptionSelected, 
+                  { borderColor: theme.colors.primary, backgroundColor: theme.colors.primary + '10' }]
               ]}
               onPress={() => setGoal('general')}
             >
               <MaterialCommunityIcons
                 name="heart-pulse"
                 size={24}
-                color={goal === 'general' ? colors.primary : colors.textSecondary}
+                color={goal === 'general' ? theme.colors.primary : theme.colors.onSurfaceVariant}
               />
               <View style={styles.goalOptionText}>
-                <Text style={styles.goalOptionTitle}>General Fitness</Text>
-                <Text style={styles.goalOptionDescription}>Balanced approach to overall fitness</Text>
+                <Text style={[styles.goalOptionTitle, { color: theme.colors.onSurface }]}>General Fitness</Text>
+                <Text style={[styles.goalOptionDescription, { color: theme.colors.onSurfaceVariant }]}>Balanced approach to overall fitness</Text>
               </View>
             </TouchableOpacity>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowGoalDialog(false)}>Cancel</Button>
-            <Button onPress={handleUpdateGoal}>Save</Button>
+            <Button onPress={() => setShowGoalDialog(false)} textColor={theme.colors.onSurface}>Cancel</Button>
+            <Button onPress={handleUpdateGoal} textColor={theme.colors.primary}>Save</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -477,28 +522,23 @@ const SettingsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     padding: spacing.md,
   },
   title: {
     fontSize: fontSizes.xxl,
     fontWeight: 'bold',
-    color: colors.text,
     marginBottom: spacing.lg,
   },
   scrollView: {
     flex: 1,
   },
   card: {
-    backgroundColor: colors.card,
     marginBottom: spacing.md,
-    borderColor: colors.border,
     borderWidth: 1,
   },
   cardTitle: {
     fontSize: fontSizes.md,
     fontWeight: '500',
-    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   profileHeader: {
@@ -513,16 +553,13 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: fontSizes.lg,
     fontWeight: 'bold',
-    color: colors.text,
     marginBottom: spacing.xs,
   },
   profileDetails: {
     fontSize: fontSizes.sm,
-    color: colors.textSecondary,
   },
   editButton: {
     marginTop: spacing.sm,
-    borderColor: colors.border,
   },
   goalContainer: {
     flexDirection: 'row',
@@ -534,7 +571,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   goalText: {
-    color: colors.text,
     fontSize: fontSizes.md,
     marginLeft: spacing.sm,
   },
@@ -544,15 +580,12 @@ const styles = StyleSheet.create({
   logoutButton: {
     marginTop: spacing.sm,
     marginBottom: spacing.xl,
-    borderColor: colors.error,
   },
   dialogInput: {
-    backgroundColor: colors.card,
     marginBottom: spacing.sm,
   },
   dialogLabel: {
     fontSize: fontSizes.sm,
-    color: colors.text,
     marginTop: spacing.sm,
     marginBottom: spacing.xs,
   },
@@ -567,20 +600,15 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.border,
     marginHorizontal: spacing.xs,
   },
   genderButtonSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '10',
   },
   genderButtonText: {
-    color: colors.textSecondary,
     fontSize: fontSizes.sm,
     marginTop: spacing.xs,
   },
   genderButtonTextSelected: {
-    color: colors.primary,
     fontWeight: '500',
   },
   goalOption: {
@@ -589,12 +617,9 @@ const styles = StyleSheet.create({
     padding: spacing.sm,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.border,
     marginBottom: spacing.sm,
   },
   goalOptionSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primary + '10',
   },
   goalOptionText: {
     marginLeft: spacing.sm,
@@ -603,11 +628,9 @@ const styles = StyleSheet.create({
   goalOptionTitle: {
     fontSize: fontSizes.sm,
     fontWeight: '500',
-    color: colors.text,
   },
   goalOptionDescription: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
     marginTop: spacing.xs,
   },
 });

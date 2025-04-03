@@ -13,7 +13,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import AppNavigator from './src/navigation/AppNavigator';
 
 // Import theme and store
-import { theme } from './src/utils/theme';
+import { lightTheme, darkTheme } from './src/utils/theme';
 import { store, RootState } from './src/store';
 
 // Import actions
@@ -37,19 +37,11 @@ function AppContent() {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useSelector((state) => state.user?.auth || {});
-  const { darkMode } = useSelector((state) => state.settings || {});
+  const settings = useSelector((state) => state.settings);
+  const darkMode = settings?.darkMode ?? false;
   
-  // Create a theme based on dark mode setting
-  const appTheme = {
-    ...theme,
-    dark: darkMode,
-    colors: {
-      ...theme.colors,
-      background: darkMode ? '#121212' : '#f5f5f5',
-      surface: darkMode ? '#1e1e1e' : '#ffffff',
-      text: darkMode ? '#ffffff' : '#121212',
-    }
-  };
+  // Use the proper theme object based on dark mode setting
+  const appTheme = darkMode ? darkTheme : lightTheme;
   
   // Load stored data on app startup
   useEffect(() => {

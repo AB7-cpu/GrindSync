@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { Card, Button, ProgressBar, Chip, Divider, IconButton, Dialog, Portal } from 'react-native-paper';
+import { Card, Button, ProgressBar, Chip, Divider, IconButton, Dialog, Portal, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { colors, spacing, fontSizes } from '../utils/theme';
@@ -35,6 +35,9 @@ const NutritionScreen: React.FC = () => {
   const [editDescription, setEditDescription] = useState('');
   const [editQuantity, setEditQuantity] = useState('');
   const [editNotes, setEditNotes] = useState('');
+
+  // Use theme from React Native Paper
+  const theme = useTheme();
 
   // Filter entries by date and meal type
   const getEntriesByMeal = (meal: 'breakfast' | 'lunch' | 'dinner' | 'snack') => {
@@ -171,56 +174,56 @@ const NutritionScreen: React.FC = () => {
     };
 
     return (
-      <Card style={styles.card}>
+      <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
         <Card.Content>
           <View style={styles.mealHeader}>
             <View style={styles.mealTitleContainer}>
               <MaterialCommunityIcons 
                 name={mealIcons[mealType]} 
-                size={20} 
-                color={colors.primary} 
+                size={24} 
+                color={theme.colors.primary} 
                 style={styles.mealIcon} 
               />
-              <Text style={styles.mealTitle}>{title}</Text>
+              <Text style={[styles.mealTitle, { color: theme.colors.onSurface }]}>{title}</Text>
             </View>
-            <Text style={styles.mealCalories}>{mealCalories} kcal</Text>
+            <Text style={[styles.mealCalories, { color: theme.colors.onSurfaceVariant }]}>{mealCalories} kcal</Text>
           </View>
           
           {entries.length > 0 ? (
             <View style={styles.foodList}>
               {entries.map(entry => (
-                <View key={entry.id} style={styles.foodItem}>
+                <View key={entry.id} style={[styles.foodItem, { backgroundColor: theme.colors.surfaceVariant }]}>
                   <View style={styles.foodItemContent}>
                     <View style={styles.foodItemMain}>
-                      <Text style={styles.foodName}>{entry.description}</Text>
-                      <Text style={styles.foodCalories}>{entry.calories} kcal</Text>
+                      <Text style={[styles.foodName, { color: theme.colors.onSurface }]}>{entry.description}</Text>
+                      <Text style={[styles.foodCalories, { color: theme.colors.onSurface }]}>{entry.calories} kcal</Text>
                     </View>
-                    <Text style={styles.foodQuantity}>{entry.quantity}</Text>
+                    <Text style={[styles.foodQuantity, { color: theme.colors.onSurfaceVariant }]}>{entry.quantity}</Text>
                     <View style={styles.macros}>
-                      <Text style={styles.macroText}>P: {entry.protein}g</Text>
-                      <Text style={styles.macroText}>C: {entry.carbs}g</Text>
-                      <Text style={styles.macroText}>F: {entry.fat}g</Text>
+                      <Text style={[styles.macroText, { color: theme.colors.onSurfaceVariant }]}>P: {entry.protein}g</Text>
+                      <Text style={[styles.macroText, { color: theme.colors.onSurfaceVariant }]}>C: {entry.carbs}g</Text>
+                      <Text style={[styles.macroText, { color: theme.colors.onSurfaceVariant }]}>F: {entry.fat}g</Text>
                     </View>
                   </View>
                   <View style={styles.foodItemActions}>
                     <IconButton
                       icon="pencil"
-                      size={16}
+                      size={20}
                       onPress={() => handleEditEntry(entry.id)}
-                      iconColor={colors.textSecondary}
+                      iconColor={theme.colors.primary}
                     />
                     <IconButton
                       icon="delete"
-                      size={16}
+                      size={20}
                       onPress={() => handleDeleteEntry(entry.id)}
-                      iconColor={colors.textSecondary}
+                      iconColor={theme.colors.error}
                     />
                   </View>
                 </View>
               ))}
             </View>
           ) : (
-            <Text style={styles.emptyMealText}>No foods added yet</Text>
+            <Text style={[styles.emptyMealText, { color: theme.colors.onSurfaceVariant }]}>No foods added yet</Text>
           )}
           
           <Button 
@@ -229,8 +232,9 @@ const NutritionScreen: React.FC = () => {
               setMealType(mealType);
               setShowFoodEntryDialog(true);
             }}
-            style={styles.addFoodButton}
+            style={[styles.addFoodButton, { borderColor: theme.colors.primary }]}
             icon="plus"
+            textColor={theme.colors.primary}
           >
             Add Food
           </Button>
@@ -240,23 +244,31 @@ const NutritionScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Nutrition</Text>
+        <Text style={[styles.title, { color: theme.colors.onBackground }]}>Nutrition</Text>
         <TouchableOpacity 
-          style={styles.waterButton}
+          style={[styles.waterButton, { 
+            backgroundColor: theme.colors.surface, 
+            borderColor: theme.colors.outline 
+          }]}
           onPress={() => setShowWaterDialog(true)}
         >
-          <MaterialCommunityIcons name="water" size={20} color={colors.secondary} />
-          <Text style={styles.waterButtonText}>{water.current}L / {water.goal}L</Text>
+          <MaterialCommunityIcons name="cup-water" size={24} color={theme.colors.primary} />
+          <Text style={[styles.waterText, { color: theme.colors.primary }]}>
+            {water.current} / {water.goal} ml
+          </Text>
         </TouchableOpacity>
       </View>
 
-      <Card style={styles.summaryCard}>
+      <Card style={[styles.summaryCard, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
         <Card.Content>
           <View style={styles.summaryHeader}>
-            <Text style={styles.summaryTitle}>Daily Nutrition</Text>
-            <Chip style={styles.calorieChip}>
+            <Text style={[styles.summaryTitle, { color: theme.colors.onSurfaceVariant }]}>Daily Nutrition</Text>
+            <Chip style={[styles.calorieChip, { 
+              backgroundColor: theme.colors.primary + '15', 
+              borderColor: theme.colors.primary + '30' 
+            }]}>
               {totals.calories} / {dailyGoals.calories} kcal
             </Chip>
           </View>
@@ -264,66 +276,66 @@ const NutritionScreen: React.FC = () => {
           <View style={styles.progressSection}>
             <View style={styles.progressItem}>
               <View style={styles.progressHeader}>
-                <Text style={styles.progressLabel}>Calories</Text>
-                <Text style={styles.progressValue}>
+                <Text style={[styles.progressLabel, { color: theme.colors.onSurface }]}>Calories</Text>
+                <Text style={[styles.progressValue, { color: theme.colors.onSurfaceVariant }]}>
                   {Math.round((totals.calories / dailyGoals.calories) * 100)}%
                 </Text>
               </View>
               <ProgressBar 
                 progress={Math.min(totals.calories / dailyGoals.calories, 1)} 
-                color={colors.primary} 
-                style={styles.progressBar} 
+                color={theme.colors.primary} 
+                style={[styles.progressBar, { backgroundColor: theme.colors.surfaceVariant }]} 
               />
             </View>
 
             <View style={styles.macroGrid}>
               <View style={styles.macroItem}>
                 <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>Protein</Text>
-                  <Text style={styles.progressValue}>
+                  <Text style={[styles.progressLabel, { color: theme.colors.onSurface }]}>Protein</Text>
+                  <Text style={[styles.progressValue, { color: theme.colors.onSurfaceVariant }]}>
                     {Math.round((totals.protein / dailyGoals.protein) * 100)}%
                   </Text>
                 </View>
                 <ProgressBar 
                   progress={Math.min(totals.protein / dailyGoals.protein, 1)} 
-                  color={colors.success} 
-                  style={styles.progressBar} 
+                  color={theme.colors.primary} 
+                  style={[styles.progressBar, { backgroundColor: theme.colors.surfaceVariant }]} 
                 />
-                <Text style={styles.macroValue}>
+                <Text style={[styles.macroValue, { color: theme.colors.onSurfaceVariant }]}>
                   {totals.protein}g / {dailyGoals.protein}g
                 </Text>
               </View>
 
               <View style={styles.macroItem}>
                 <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>Carbs</Text>
-                  <Text style={styles.progressValue}>
+                  <Text style={[styles.progressLabel, { color: theme.colors.onSurface }]}>Carbs</Text>
+                  <Text style={[styles.progressValue, { color: theme.colors.onSurfaceVariant }]}>
                     {Math.round((totals.carbs / dailyGoals.carbs) * 100)}%
                   </Text>
                 </View>
                 <ProgressBar 
                   progress={Math.min(totals.carbs / dailyGoals.carbs, 1)} 
-                  color={colors.warning} 
-                  style={styles.progressBar} 
+                  color={theme.colors.primary} 
+                  style={[styles.progressBar, { backgroundColor: theme.colors.surfaceVariant }]} 
                 />
-                <Text style={styles.macroValue}>
+                <Text style={[styles.macroValue, { color: theme.colors.onSurfaceVariant }]}>
                   {totals.carbs}g / {dailyGoals.carbs}g
                 </Text>
               </View>
 
               <View style={styles.macroItem}>
                 <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>Fat</Text>
-                  <Text style={styles.progressValue}>
+                  <Text style={[styles.progressLabel, { color: theme.colors.onSurface }]}>Fat</Text>
+                  <Text style={[styles.progressValue, { color: theme.colors.onSurfaceVariant }]}>
                     {Math.round((totals.fat / dailyGoals.fat) * 100)}%
                   </Text>
                 </View>
                 <ProgressBar 
                   progress={Math.min(totals.fat / dailyGoals.fat, 1)} 
-                  color={colors.error} 
-                  style={styles.progressBar} 
+                  color={theme.colors.primary} 
+                  style={[styles.progressBar, { backgroundColor: theme.colors.surfaceVariant }]} 
                 />
-                <Text style={styles.macroValue}>
+                <Text style={[styles.macroValue, { color: theme.colors.onSurfaceVariant }]}>
                   {totals.fat}g / {dailyGoals.fat}g
                 </Text>
               </View>
@@ -339,60 +351,111 @@ const NutritionScreen: React.FC = () => {
         {renderMealSection('Snacks', 'snack')}
       </ScrollView>
 
-      {/* Add Food Dialog */}
+      {/* Food Entry Dialog */}
       <Portal>
         <Dialog visible={showFoodEntryDialog} onDismiss={() => setShowFoodEntryDialog(false)}>
           <Dialog.Title>Add Food</Dialog.Title>
           <Dialog.Content>
-            <Text style={styles.dialogLabel}>What did you eat?</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Food Description</Text>
             <TextInput
-              style={styles.dialogInput}
+              style={[styles.dialogInput, { color: theme.colors.onSurface, borderColor: theme.colors.outline }]}
               placeholder="e.g. Grilled chicken with rice"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               value={foodDescription}
               onChangeText={setFoodDescription}
+              editable={!isProcessing}
             />
             
-            <Text style={styles.dialogLabel}>How much?</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Quantity/Serving Size</Text>
             <TextInput
-              style={styles.dialogInput}
+              style={[styles.dialogInput, { color: theme.colors.onSurface, borderColor: theme.colors.outline }]}
               placeholder="e.g. 1 medium bowl, 200g"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               value={foodQuantity}
               onChangeText={setFoodQuantity}
+              editable={!isProcessing}
             />
             
-            <Text style={styles.dialogLabel}>Meal</Text>
-            <View style={styles.mealTypeButtons}>
-              {(['breakfast', 'lunch', 'dinner', 'snack'] as const).map((type) => (
-                <Chip
-                  key={type}
-                  selected={mealType === type}
-                  onPress={() => setMealType(type)}
-                  style={[
-                    styles.mealTypeChip,
-                    mealType === type && { backgroundColor: colors.primary + '20' }
-                  ]}
-                  textStyle={mealType === type ? { color: colors.primary } : {}}
-                >
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </Chip>
-              ))}
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Meal Type</Text>
+            <View style={styles.mealTypeContainer}>
+              <Chip 
+                selected={mealType === 'breakfast'} 
+                onPress={() => setMealType('breakfast')}
+                style={[
+                  styles.mealTypeChip,
+                  mealType === 'breakfast' && { backgroundColor: theme.colors.primary + '20' }
+                ]}
+                textStyle={{ 
+                  color: mealType === 'breakfast' ? theme.colors.primary : theme.colors.onSurface
+                }}
+              >
+                Breakfast
+              </Chip>
+              <Chip 
+                selected={mealType === 'lunch'} 
+                onPress={() => setMealType('lunch')}
+                style={[
+                  styles.mealTypeChip,
+                  mealType === 'lunch' && { backgroundColor: theme.colors.primary + '20' }
+                ]}
+                textStyle={{ 
+                  color: mealType === 'lunch' ? theme.colors.primary : theme.colors.onSurface
+                }}
+              >
+                Lunch
+              </Chip>
+              <Chip 
+                selected={mealType === 'dinner'} 
+                onPress={() => setMealType('dinner')}
+                style={[
+                  styles.mealTypeChip,
+                  mealType === 'dinner' && { backgroundColor: theme.colors.primary + '20' }
+                ]}
+                textStyle={{ 
+                  color: mealType === 'dinner' ? theme.colors.primary : theme.colors.onSurface
+                }}
+              >
+                Dinner
+              </Chip>
+              <Chip 
+                selected={mealType === 'snack'} 
+                onPress={() => setMealType('snack')}
+                style={[
+                  styles.mealTypeChip,
+                  mealType === 'snack' && { backgroundColor: theme.colors.primary + '20' }
+                ]}
+                textStyle={{ 
+                  color: mealType === 'snack' ? theme.colors.primary : theme.colors.onSurface
+                }}
+              >
+                Snack
+              </Chip>
             </View>
             
-            <Text style={styles.dialogLabel}>Notes (optional)</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Notes (optional)</Text>
             <TextInput
-              style={[styles.dialogInput, styles.notesInput]}
+              style={[styles.dialogInput, styles.notesInput, { color: theme.colors.onSurface, borderColor: theme.colors.outline }]}
               placeholder="Any details about this food..."
-              multiline
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               value={foodNotes}
               onChangeText={setFoodNotes}
+              multiline
+              editable={!isProcessing}
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowFoodEntryDialog(false)}>Cancel</Button>
+            <Button 
+              onPress={() => setShowFoodEntryDialog(false)} 
+              disabled={isProcessing}
+              textColor={theme.colors.onSurface}
+            >
+              Cancel
+            </Button>
             <Button 
               onPress={handleAddFood} 
               loading={isProcessing}
-              disabled={isProcessing || !foodDescription.trim() || !foodQuantity.trim()}
+              disabled={!foodDescription.trim() || !foodQuantity.trim() || isProcessing}
+              textColor={theme.colors.primary}
             >
               Add
             </Button>
@@ -405,19 +468,20 @@ const NutritionScreen: React.FC = () => {
         <Dialog visible={showWaterDialog} onDismiss={() => setShowWaterDialog(false)}>
           <Dialog.Title>Update Water Intake</Dialog.Title>
           <Dialog.Content>
-            <Text style={styles.dialogLabel}>How much water have you had today?</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Water Amount (ml)</Text>
             <TextInput
-              style={styles.dialogInput}
-              placeholder="e.g. 1.5"
+              style={[styles.dialogInput, { color: theme.colors.onSurface, borderColor: theme.colors.outline }]}
+              placeholder="e.g. 500"
+              placeholderTextColor={theme.colors.onSurfaceVariant}
               value={waterAmount}
               onChangeText={setWaterAmount}
               keyboardType="numeric"
             />
-            <Text style={styles.dialogHelp}>Enter amount in liters</Text>
+            <Text style={[styles.dialogHelp, { color: theme.colors.onSurfaceVariant }]}>Enter amount in milliliters</Text>
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowWaterDialog(false)}>Cancel</Button>
-            <Button onPress={handleUpdateWater}>Update</Button>
+            <Button onPress={() => setShowWaterDialog(false)} textColor={theme.colors.onSurface}>Cancel</Button>
+            <Button onPress={handleUpdateWater} textColor={theme.colors.primary}>Update</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>
@@ -425,36 +489,46 @@ const NutritionScreen: React.FC = () => {
       {/* Edit Food Dialog */}
       <Portal>
         <Dialog visible={showEditDialog} onDismiss={() => setShowEditDialog(false)}>
-          <Dialog.Title>Edit Food</Dialog.Title>
+          <Dialog.Title>Edit Food Entry</Dialog.Title>
           <Dialog.Content>
-            <Text style={styles.dialogLabel}>Food Description</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Food Description</Text>
             <TextInput
-              style={styles.dialogInput}
+              style={[styles.dialogInput, { color: theme.colors.onSurface, borderColor: theme.colors.outline }]}
               value={editDescription}
               onChangeText={setEditDescription}
+              editable={!isProcessing}
             />
             
-            <Text style={styles.dialogLabel}>Quantity</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Quantity/Serving Size</Text>
             <TextInput
-              style={styles.dialogInput}
+              style={[styles.dialogInput, { color: theme.colors.onSurface, borderColor: theme.colors.outline }]}
               value={editQuantity}
               onChangeText={setEditQuantity}
+              editable={!isProcessing}
             />
             
-            <Text style={styles.dialogLabel}>Notes (optional)</Text>
+            <Text style={[styles.dialogLabel, { color: theme.colors.onSurface }]}>Notes (optional)</Text>
             <TextInput
-              style={[styles.dialogInput, styles.notesInput]}
-              multiline
+              style={[styles.dialogInput, styles.notesInput, { color: theme.colors.onSurface, borderColor: theme.colors.outline }]}
               value={editNotes}
               onChangeText={setEditNotes}
+              multiline
+              editable={!isProcessing}
             />
           </Dialog.Content>
           <Dialog.Actions>
-            <Button onPress={() => setShowEditDialog(false)}>Cancel</Button>
+            <Button 
+              onPress={() => setShowEditDialog(false)} 
+              disabled={isProcessing}
+              textColor={theme.colors.onSurface}
+            >
+              Cancel
+            </Button>
             <Button 
               onPress={handleSaveEdit} 
               loading={isProcessing}
-              disabled={isProcessing || !editDescription.trim() || !editQuantity.trim()}
+              disabled={!editDescription.trim() || !editQuantity.trim() || isProcessing}
+              textColor={theme.colors.primary}
             >
               Save
             </Button>
@@ -468,7 +542,6 @@ const NutritionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     padding: spacing.md,
   },
   header: {
@@ -480,20 +553,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSizes.xxl,
     fontWeight: 'bold',
-    color: colors.text,
   },
   waterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.card,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.border,
   },
-  waterButtonText: {
-    color: colors.text,
+  waterText: {
     marginLeft: spacing.xs,
     fontSize: fontSizes.sm,
   },
@@ -592,7 +661,6 @@ const styles = StyleSheet.create({
   },
   foodItem: {
     flexDirection: 'row',
-    backgroundColor: colors.cardLight,
     borderRadius: 8,
     marginBottom: spacing.sm,
     padding: spacing.sm,
@@ -618,7 +686,6 @@ const styles = StyleSheet.create({
   },
   foodQuantity: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
   },
   macros: {
     flexDirection: 'row',
@@ -626,7 +693,6 @@ const styles = StyleSheet.create({
   },
   macroText: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
     marginRight: spacing.sm,
   },
   foodItemActions: {
@@ -643,28 +709,24 @@ const styles = StyleSheet.create({
   addFoodButton: {
     borderColor: colors.border,
   },
-  dialogLabel: {
-    fontSize: fontSizes.sm,
-    color: colors.text,
-    marginBottom: spacing.xs,
-    marginTop: spacing.sm,
-  },
   dialogInput: {
-    backgroundColor: colors.card,
-    borderRadius: 8,
+    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderRadius: 4,
     padding: spacing.sm,
-    color: colors.text,
+    marginBottom: spacing.md,
+  },
+  dialogLabel: {
+    marginBottom: spacing.xs,
+    fontSize: fontSizes.sm,
   },
   notesInput: {
-    minHeight: 80,
+    height: 100,
     textAlignVertical: 'top',
   },
   dialogHelp: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
-    marginTop: spacing.xs,
+    marginTop: -spacing.sm,
   },
   mealTypeButtons: {
     flexDirection: 'row',
@@ -676,6 +738,12 @@ const styles = StyleSheet.create({
     marginRight: spacing.xs,
     marginBottom: spacing.xs,
     backgroundColor: colors.card,
+  },
+  mealTypeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
   },
 });
 

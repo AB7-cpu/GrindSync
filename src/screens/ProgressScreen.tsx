@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Card, Chip, SegmentedButtons, Button } from 'react-native-paper';
+import { Card, Chip, SegmentedButtons, Button, useTheme } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { RootState } from '../store';
-import { colors, spacing, fontSizes } from '../utils/theme';
+import { spacing, fontSizes } from '../utils/theme';
 import { workoutAnalysisService } from '../services/workoutAnalysisService';
 
 // Mock chart component - in a real app, you'd use a library like Victory or react-native-chart-kit
 const Chart = ({ data, type }: { data: any[], type: string }) => {
+  const theme = useTheme();
+  
   return (
-    <View style={styles.chartPlaceholder}>
-      <Text style={styles.chartPlaceholderText}>
+    <View style={[styles.chartPlaceholder, { backgroundColor: theme.colors.surfaceVariant }]}>
+      <Text style={[styles.chartPlaceholderText, { color: theme.colors.onSurfaceVariant }]}>
         {type.charAt(0).toUpperCase() + type.slice(1)} Chart
       </Text>
-      <Text style={styles.chartPlaceholderSubtext}>
+      <Text style={[styles.chartPlaceholderSubtext, { color: theme.colors.onSurfaceVariant }]}>
         (Visualization would render here using actual chart library)
       </Text>
     </View>
@@ -30,6 +32,9 @@ const ProgressScreen: React.FC = () => {
   
   // State for AI analysis visibility
   const [showAnalysis, setShowAnalysis] = useState(false);
+  
+  // Get theme
+  const theme = useTheme();
   
   // Get data from Redux store with safe fallbacks
   const workout = useSelector((state: RootState) => state.workout || {});
@@ -133,45 +138,45 @@ const ProgressScreen: React.FC = () => {
   const renderWorkoutsContent = () => {
     return (
       <>
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Workout Summary</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Workout Summary</Text>
             <View style={styles.statsGrid}>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{workoutProgress.totalWorkouts}</Text>
-                <Text style={styles.statLabel}>Total Workouts</Text>
+                <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{workoutProgress.totalWorkouts}</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>Total Workouts</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{Math.round(workoutProgress.totalTime / 60)}</Text>
-                <Text style={styles.statLabel}>Hours Active</Text>
+                <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{Math.round(workoutProgress.totalTime / 60)}</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>Hours Active</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{workoutProgress.totalCaloriesBurned}</Text>
-                <Text style={styles.statLabel}>Calories Burned</Text>
+                <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{workoutProgress.totalCaloriesBurned}</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>Calories Burned</Text>
               </View>
             </View>
           </Card.Content>
         </Card>
         
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Strength Progress</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Strength Progress</Text>
             <Chart data={chartData} type="strength" />
             <View style={styles.exerciseHighlights}>
               <View style={styles.exerciseHighlight}>
-                <MaterialCommunityIcons name="trophy" size={20} color={colors.success} style={styles.highlightIcon} />
+                <MaterialCommunityIcons name="trophy" size={20} color={theme.colors.primary} style={styles.highlightIcon} />
                 <View>
-                  <Text style={styles.highlightTitle}>Strongest Lift</Text>
-                  <Text style={styles.highlightValue}>
+                  <Text style={[styles.highlightTitle, { color: theme.colors.onSurfaceVariant }]}>Strongest Lift</Text>
+                  <Text style={[styles.highlightValue, { color: theme.colors.onSurface }]}>
                     {workoutProgress.strongestLift.exercise}: {workoutProgress.strongestLift.weight} lbs
                   </Text>
                 </View>
               </View>
               <View style={styles.exerciseHighlight}>
-                <MaterialCommunityIcons name="repeat" size={20} color={colors.primary} style={styles.highlightIcon} />
+                <MaterialCommunityIcons name="repeat" size={20} color={theme.colors.primary} style={styles.highlightIcon} />
                 <View>
-                  <Text style={styles.highlightTitle}>Most Frequent Exercise</Text>
-                  <Text style={styles.highlightValue}>
+                  <Text style={[styles.highlightTitle, { color: theme.colors.onSurfaceVariant }]}>Most Frequent Exercise</Text>
+                  <Text style={[styles.highlightValue, { color: theme.colors.onSurface }]}>
                     {workoutProgress.frequentExercise.name} ({workoutProgress.frequentExercise.count} times)
                   </Text>
                 </View>
@@ -180,9 +185,9 @@ const ProgressScreen: React.FC = () => {
           </Card.Content>
         </Card>
         
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Workout Frequency</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Workout Frequency</Text>
             <Chart data={chartData} type="frequency" />
           </Card.Content>
         </Card>
@@ -194,53 +199,53 @@ const ProgressScreen: React.FC = () => {
   const renderNutritionContent = () => {
     return (
       <>
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Nutrition Summary</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Nutrition Summary</Text>
             <View style={styles.statsGrid}>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{nutritionProgress.averageCalories}</Text>
-                <Text style={styles.statLabel}>Avg Calories</Text>
+                <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{nutritionProgress.averageCalories}</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>Avg Calories</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{nutritionProgress.averageProtein}g</Text>
-                <Text style={styles.statLabel}>Avg Protein</Text>
+                <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{nutritionProgress.averageProtein}g</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>Avg Protein</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{nutritionProgress.averageCarbs}g</Text>
-                <Text style={styles.statLabel}>Avg Carbs</Text>
+                <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{nutritionProgress.averageCarbs}g</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>Avg Carbs</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statValue}>{nutritionProgress.averageFat}g</Text>
-                <Text style={styles.statLabel}>Avg Fat</Text>
+                <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{nutritionProgress.averageFat}g</Text>
+                <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>Avg Fat</Text>
               </View>
             </View>
           </Card.Content>
         </Card>
         
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Calorie Intake</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Calorie Intake</Text>
             <Chart data={chartData} type="calories" />
           </Card.Content>
         </Card>
         
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Macronutrient Balance</Text>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurfaceVariant }]}>Macronutrient Balance</Text>
             <Chart data={chartData} type="macros" />
             <View style={styles.macroLegend}>
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: colors.success }]} />
-                <Text style={styles.legendText}>Protein</Text>
+                <View style={[styles.legendColor, { backgroundColor: theme.colors.primary }]} />
+                <Text style={[styles.legendText, { color: theme.colors.onSurfaceVariant }]}>Protein</Text>
               </View>
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: colors.warning }]} />
-                <Text style={styles.legendText}>Carbs</Text>
+                <View style={[styles.legendColor, { backgroundColor: theme.colors.secondary }]} />
+                <Text style={[styles.legendText, { color: theme.colors.onSurfaceVariant }]}>Carbs</Text>
               </View>
               <View style={styles.legendItem}>
-                <View style={[styles.legendColor, { backgroundColor: colors.error }]} />
-                <Text style={styles.legendText}>Fat</Text>
+                <View style={[styles.legendColor, { backgroundColor: theme.colors.tertiary || theme.colors.error }]} />
+                <Text style={[styles.legendText, { color: theme.colors.onSurfaceVariant }]}>Fat</Text>
               </View>
             </View>
           </Card.Content>
@@ -250,22 +255,25 @@ const ProgressScreen: React.FC = () => {
   };
   
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Progress</Text>
+        <Text style={[styles.title, { color: theme.colors.onBackground }]}>Progress</Text>
         <TouchableOpacity 
-          style={styles.analysisButton}
+          style={[styles.analysisButton, { 
+            backgroundColor: theme.colors.surface, 
+            borderColor: showAnalysis ? theme.colors.primary : theme.colors.outline 
+          }]}
           onPress={() => setShowAnalysis(!showAnalysis)}
         >
           <MaterialCommunityIcons 
             name="brain" 
             size={20} 
-            color={showAnalysis ? colors.primary : colors.textSecondary} 
+            color={showAnalysis ? theme.colors.primary : theme.colors.onSurfaceVariant} 
           />
           <Text 
             style={[
               styles.analysisButtonText, 
-              showAnalysis && { color: colors.primary }
+              { color: showAnalysis ? theme.colors.primary : theme.colors.onSurfaceVariant }
             ]}
           >
             AI Analysis
@@ -283,26 +291,33 @@ const ProgressScreen: React.FC = () => {
             { value: 'year', label: 'Year' },
             { value: 'all', label: 'All Time' },
           ]}
-          style={styles.segmentedButtons}
+          style={[styles.segmentedButtons, { backgroundColor: theme.colors.surface }]}
         />
       </View>
       
-      <View style={styles.tabSelector}>
+      <View style={[styles.tabSelector, { 
+        backgroundColor: theme.colors.surface, 
+        borderColor: theme.colors.outline 
+      }]}>
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'workouts' && styles.activeTab
+            activeTab === 'workouts' && [styles.activeTab, { 
+              backgroundColor: theme.colors.primary + '15', 
+              borderBottomColor: theme.colors.primary 
+            }]
           ]}
           onPress={() => setActiveTab('workouts')}
         >
           <MaterialCommunityIcons
             name="dumbbell"
             size={20}
-            color={activeTab === 'workouts' ? colors.primary : colors.textSecondary}
+            color={activeTab === 'workouts' ? theme.colors.primary : theme.colors.onSurfaceVariant}
           />
           <Text
             style={[
               styles.tabText,
+              { color: activeTab === 'workouts' ? theme.colors.primary : theme.colors.onSurfaceVariant },
               activeTab === 'workouts' && styles.activeTabText
             ]}
           >
@@ -313,18 +328,22 @@ const ProgressScreen: React.FC = () => {
         <TouchableOpacity
           style={[
             styles.tab,
-            activeTab === 'nutrition' && styles.activeTab
+            activeTab === 'nutrition' && [styles.activeTab, { 
+              backgroundColor: theme.colors.primary + '15', 
+              borderBottomColor: theme.colors.primary 
+            }]
           ]}
           onPress={() => setActiveTab('nutrition')}
         >
           <MaterialCommunityIcons
             name="food-apple"
             size={20}
-            color={activeTab === 'nutrition' ? colors.primary : colors.textSecondary}
+            color={activeTab === 'nutrition' ? theme.colors.primary : theme.colors.onSurfaceVariant}
           />
           <Text
             style={[
               styles.tabText,
+              { color: activeTab === 'nutrition' ? theme.colors.primary : theme.colors.onSurfaceVariant },
               activeTab === 'nutrition' && styles.activeTabText
             ]}
           >
@@ -334,25 +353,29 @@ const ProgressScreen: React.FC = () => {
       </View>
       
       {showAnalysis && (
-        <Card style={styles.aiCard}>
+        <Card style={[styles.aiCard, { 
+          backgroundColor: theme.colors.surface, 
+          borderColor: theme.colors.primary + '30' 
+        }]}>
           <Card.Content>
             <View style={styles.aiHeaderRow}>
-              <MaterialCommunityIcons name="brain" size={20} color={colors.primary} />
-              <Text style={styles.aiCardTitle}>{aiInsights.title}</Text>
+              <MaterialCommunityIcons name="brain" size={20} color={theme.colors.primary} />
+              <Text style={[styles.aiCardTitle, { color: theme.colors.primary }]}>{aiInsights.title}</Text>
             </View>
             
             {aiInsights.insights.map((insight, index) => (
               <View key={index} style={styles.insightItem}>
-                <MaterialCommunityIcons name="lightbulb-on" size={16} color={colors.primary} style={styles.insightIcon} />
-                <Text style={styles.insightText}>{insight}</Text>
+                <MaterialCommunityIcons name="lightbulb-on" size={16} color={theme.colors.primary} style={styles.insightIcon} />
+                <Text style={[styles.insightText, { color: theme.colors.onSurface }]}>{insight}</Text>
               </View>
             ))}
             
             <Button 
               mode="outlined" 
               onPress={() => {/* Request more detailed analysis */}}
-              style={styles.aiButton}
+              style={[styles.aiButton, { borderColor: theme.colors.primary }]}
               icon="chart-line"
+              textColor={theme.colors.primary}
             >
               Get More Detailed Analysis
             </Button>
@@ -370,7 +393,6 @@ const ProgressScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     padding: spacing.md,
   },
   header: {
@@ -382,20 +404,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: fontSizes.xxl,
     fontWeight: 'bold',
-    color: colors.text,
   },
   analysisButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.card,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.border,
   },
   analysisButtonText: {
-    color: colors.textSecondary,
     marginLeft: spacing.xs,
     fontSize: fontSizes.sm,
   },
@@ -403,15 +421,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   segmentedButtons: {
-    backgroundColor: colors.card,
   },
   tabSelector: {
     flexDirection: 'row',
     marginBottom: spacing.md,
-    backgroundColor: colors.card,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.border,
     overflow: 'hidden',
   },
   tab: {
@@ -422,32 +437,25 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   activeTab: {
-    backgroundColor: colors.primary + '15',
     borderBottomWidth: 2,
-    borderBottomColor: colors.primary,
   },
   tabText: {
-    color: colors.textSecondary,
     marginLeft: spacing.xs,
     fontSize: fontSizes.sm,
   },
   activeTabText: {
-    color: colors.primary,
     fontWeight: '500',
   },
   scrollView: {
     flex: 1,
   },
   card: {
-    backgroundColor: colors.card,
     marginBottom: spacing.md,
-    borderColor: colors.border,
     borderWidth: 1,
   },
   cardTitle: {
     fontSize: fontSizes.md,
     fontWeight: '500',
-    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   statsGrid: {
@@ -463,17 +471,14 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: fontSizes.xl,
     fontWeight: 'bold',
-    color: colors.text,
     marginBottom: spacing.xs,
   },
   statLabel: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
     textAlign: 'center',
   },
   chartPlaceholder: {
     height: 200,
-    backgroundColor: colors.cardLight,
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -481,12 +486,10 @@ const styles = StyleSheet.create({
   },
   chartPlaceholderText: {
     fontSize: fontSizes.md,
-    color: colors.text,
     fontWeight: '500',
   },
   chartPlaceholderSubtext: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
     marginTop: spacing.xs,
   },
   exerciseHighlights: {
@@ -502,12 +505,10 @@ const styles = StyleSheet.create({
   },
   highlightTitle: {
     fontSize: fontSizes.sm,
-    color: colors.textSecondary,
   },
   highlightValue: {
     fontSize: fontSizes.sm,
     fontWeight: '500',
-    color: colors.text,
   },
   macroLegend: {
     flexDirection: 'row',
@@ -527,12 +528,9 @@ const styles = StyleSheet.create({
   },
   legendText: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
   },
   aiCard: {
-    backgroundColor: colors.card,
     marginBottom: spacing.md,
-    borderColor: colors.primary + '30',
     borderWidth: 1,
   },
   aiHeaderRow: {
@@ -543,7 +541,6 @@ const styles = StyleSheet.create({
   aiCardTitle: {
     fontSize: fontSizes.md,
     fontWeight: '500',
-    color: colors.primary,
     marginLeft: spacing.xs,
   },
   insightItem: {
@@ -558,12 +555,10 @@ const styles = StyleSheet.create({
   insightText: {
     flex: 1,
     fontSize: fontSizes.sm,
-    color: colors.text,
     lineHeight: 20,
   },
   aiButton: {
     marginTop: spacing.sm,
-    borderColor: colors.primary,
   },
 });
 
