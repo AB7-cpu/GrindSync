@@ -54,8 +54,12 @@ export const settingsSlice = createSlice({
   reducers: {
     // Toggle dark mode
     toggleDarkMode: (state) => {
-      state.darkMode = !state.darkMode;
-      persistSettings(state);
+      const newDarkModeValue = !state.darkMode;
+      state.darkMode = newDarkModeValue;
+      
+      // Create a copy of the entire state to persist
+      const stateCopy = JSON.parse(JSON.stringify(state));
+      persistSettings(stateCopy);
     },
     
     // Set specific dark mode state

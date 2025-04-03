@@ -1,7 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { colors } from '../utils/theme';
+import { useTheme } from 'react-native-paper';
+import { colors as themeColors } from '../utils/theme';
 
 // Import Screens
 import DashboardScreen from '../screens/DashboardScreen';
@@ -13,28 +14,33 @@ import SettingsScreen from '../screens/SettingsScreen';
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
+  // Use the current theme from React Native Paper
+  const paperTheme = useTheme();
+  
   return (
     <Tab.Navigator
-      screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
+      screenOptions={({ route }) => ({
+        tabBarActiveTintColor: paperTheme.colors.primary,
+        tabBarInactiveTintColor: themeColors.textSecondary,
         tabBarStyle: {
-          backgroundColor: colors.card,
-          borderTopColor: colors.border,
+          backgroundColor: paperTheme.colors.surface,
+          borderTopColor: themeColors.border,
           paddingBottom: 5,
           paddingTop: 5,
           height: 60,
         },
         headerStyle: {
-          backgroundColor: colors.background,
-          borderBottomColor: colors.border,
+          backgroundColor: paperTheme.colors.background,
+          borderBottomColor: themeColors.border,
           borderBottomWidth: 1,
         },
-        headerTintColor: colors.text,
+        headerTintColor: themeColors.text,
         headerTitleStyle: {
           fontWeight: 'bold',
         },
-      }}
+        // Hide header for all screens except Dashboard
+        headerShown: route.name === 'Dashboard',
+      })}
     >
       <Tab.Screen
         name="Dashboard"

@@ -1,17 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Card, Button, Avatar, ProgressBar, Divider } from 'react-native-paper';
+import { Card, Button, Avatar, ProgressBar, Divider, useTheme } from 'react-native-paper';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useSelector } from 'react-redux';
 import { useNavigation, ParamListBase } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootState } from '../store';
-import { colors, spacing, fontSizes } from '../utils/theme';
+import { spacing, fontSizes } from '../utils/theme';
+
+// Add tintColor helper for icons that need color properties not in MD3Colors
+const iconColors = {
+  success: '#4CAF50',  // Green
+  warning: '#FFC107',  // Amber 
+  info: '#2196F3',     // Blue
+  error: '#F44336'     // Red
+};
 
 const DashboardScreen: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
   const user = useSelector((state: RootState) => state.user);
   const profile = user?.profile || { name: 'User' };
+  
+  // Get theme from React Native Paper
+  const theme = useTheme();
   
   // Fix the destructuring to match the actual state shape
   const workout = useSelector((state: RootState) => state.workout);
@@ -76,12 +87,12 @@ const DashboardScreen: React.FC = () => {
   };
   
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
       {/* Welcome Section */}
       <View style={styles.welcomeSection}>
         <View style={styles.welcomeContent}>
-          <Text style={styles.greeting}>Hello, {profile.name}!</Text>
-          <Text style={styles.welcomeMessage}>
+          <Text style={[styles.greeting, { color: theme.colors.onBackground }]}>Hello, {profile.name}!</Text>
+          <Text style={[styles.welcomeMessage, { color: theme.colors.onSurfaceVariant }]}>
             {getGreetingMessage()}
           </Text>
         </View>
@@ -89,34 +100,34 @@ const DashboardScreen: React.FC = () => {
           size={60} 
           label={profile.name.substring(0, 2).toUpperCase()} 
           color="white"
-          style={{ backgroundColor: colors.primary }}
+          style={{ backgroundColor: theme.colors.primary }}
         />
       </View>
       
       {/* Today's Overview Card */}
-      <Card style={styles.card}>
+      <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
         <Card.Content>
-          <Text style={styles.cardTitle}>Today's Overview</Text>
+          <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>Today's Overview</Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
-              <MaterialCommunityIcons name="fire" size={24} color={colors.warning} />
-              <Text style={styles.statValue}>{nutritionTotals.calories}</Text>
-              <Text style={styles.statLabel}>kcal</Text>
+              <MaterialCommunityIcons name="fire" size={24} color={iconColors.warning} />
+              <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{nutritionTotals.calories}</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>kcal</Text>
             </View>
             <View style={styles.statItem}>
-              <MaterialCommunityIcons name="food-drumstick" size={24} color={colors.success} />
-              <Text style={styles.statValue}>{nutritionTotals.protein}g</Text>
-              <Text style={styles.statLabel}>protein</Text>
+              <MaterialCommunityIcons name="food-drumstick" size={24} color={iconColors.success} />
+              <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{nutritionTotals.protein}g</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>protein</Text>
             </View>
             <View style={styles.statItem}>
-              <MaterialCommunityIcons name="water" size={24} color={colors.info} />
-              <Text style={styles.statValue}>{water.current}L</Text>
-              <Text style={styles.statLabel}>water</Text>
+              <MaterialCommunityIcons name="water" size={24} color={iconColors.info} />
+              <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{water.current}L</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>water</Text>
             </View>
             <View style={styles.statItem}>
-              <MaterialCommunityIcons name="dumbbell" size={24} color={colors.primary} />
-              <Text style={styles.statValue}>{workoutStats.streak}</Text>
-              <Text style={styles.statLabel}>streak</Text>
+              <MaterialCommunityIcons name="dumbbell" size={24} color={theme.colors.primary} />
+              <Text style={[styles.statValue, { color: theme.colors.onSurface }]}>{workoutStats.streak}</Text>
+              <Text style={[styles.statLabel, { color: theme.colors.onSurfaceVariant }]}>streak</Text>
             </View>
           </View>
         </Card.Content>
@@ -124,14 +135,19 @@ const DashboardScreen: React.FC = () => {
       
       {/* Active Workout Card (if exists) */}
       {activeWorkout ? (
-        <Card style={[styles.card, { borderLeftColor: colors.primary, borderLeftWidth: 3 }]}>
+        <Card style={[styles.card, { 
+          backgroundColor: theme.colors.surface, 
+          borderColor: theme.colors.outline, 
+          borderLeftColor: theme.colors.primary, 
+          borderLeftWidth: 3 
+        }]}>
           <Card.Content>
             <View style={styles.activeWorkoutHeader}>
-              <MaterialCommunityIcons name="lightning-bolt" size={24} color={colors.primary} />
-              <Text style={styles.activeWorkoutTitle}>Workout in Progress</Text>
+              <MaterialCommunityIcons name="lightning-bolt" size={24} color={theme.colors.primary} />
+              <Text style={[styles.activeWorkoutTitle, { color: theme.colors.primary }]}>Workout in Progress</Text>
             </View>
-            <Text style={styles.workoutName}>{activeWorkout.name}</Text>
-            <Text style={styles.workoutDetails}>
+            <Text style={[styles.workoutName, { color: theme.colors.onSurface }]}>{activeWorkout.name}</Text>
+            <Text style={[styles.workoutDetails, { color: theme.colors.onSurfaceVariant }]}>
               Started {formatTimeAgo(new Date(activeWorkout.date))} • {
                 activeWorkout.exercises.filter(ex => 
                   ex.sets.some(set => set.completed)
@@ -141,40 +157,43 @@ const DashboardScreen: React.FC = () => {
             <Button 
               mode="contained" 
               onPress={handleStartWorkout}
-              style={styles.actionButton}
+              style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
+              textColor={theme.colors.onPrimary}
             >
               Continue Workout
             </Button>
           </Card.Content>
         </Card>
       ) : nextWorkout ? (
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Next Workout</Text>
-            <Text style={styles.workoutName}>{nextWorkout.name}</Text>
-            <Text style={styles.workoutDetails}>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>Next Workout</Text>
+            <Text style={[styles.workoutName, { color: theme.colors.onSurface }]}>{nextWorkout.name}</Text>
+            <Text style={[styles.workoutDetails, { color: theme.colors.onSurfaceVariant }]}>
               Scheduled for {formatDate(new Date(nextWorkout.date))} • {nextWorkout.duration || 45} min
             </Text>
             <Button 
               mode="contained" 
               onPress={handleStartWorkout}
-              style={styles.actionButton}
+              style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
+              textColor={theme.colors.onPrimary}
             >
               Start Workout
             </Button>
           </Card.Content>
         </Card>
       ) : (
-        <Card style={styles.card}>
+        <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
           <Card.Content>
-            <Text style={styles.cardTitle}>Ready for a Workout?</Text>
-            <Text style={styles.noWorkoutText}>
+            <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>Ready for a Workout?</Text>
+            <Text style={[styles.noWorkoutText, { color: theme.colors.onSurfaceVariant }]}>
               No workouts scheduled for today. Choose a workout to get started.
             </Text>
             <Button 
               mode="contained" 
               onPress={handleStartWorkout}
-              style={styles.actionButton}
+              style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
+              textColor={theme.colors.onPrimary}
             >
               Browse Workouts
             </Button>
@@ -183,60 +202,60 @@ const DashboardScreen: React.FC = () => {
       )}
       
       {/* Nutrition Card */}
-      <Card style={styles.card}>
+      <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
         <Card.Content>
-          <Text style={styles.cardTitle}>Nutrition Today</Text>
+          <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>Nutrition Today</Text>
           <View style={styles.nutritionSection}>
             <View style={styles.nutritionHeader}>
-              <Text style={styles.nutritionLabel}>Calories</Text>
-              <Text style={styles.nutritionValue}>
+              <Text style={[styles.nutritionLabel, { color: theme.colors.onSurface }]}>Calories</Text>
+              <Text style={[styles.nutritionValue, { color: theme.colors.onSurface }]}>
                 {nutritionTotals.calories} / {dailyGoals.calories} kcal
               </Text>
             </View>
             <ProgressBar 
               progress={Math.min(nutritionTotals.calories / dailyGoals.calories, 1)} 
-              color={colors.primary} 
-              style={styles.progressBar}
+              color={theme.colors.primary} 
+              style={[styles.progressBar, { backgroundColor: theme.colors.surfaceVariant }]}
             />
           </View>
           
           <View style={styles.macrosGrid}>
             <View style={styles.macroItem}>
-              <Text style={styles.macroLabel}>Protein</Text>
+              <Text style={[styles.macroLabel, { color: theme.colors.onSurface }]}>Protein</Text>
               <View style={styles.macroValueContainer}>
-                <Text style={styles.macroValue}>{nutritionTotals.protein}</Text>
-                <Text style={styles.macroUnit}>g</Text>
+                <Text style={[styles.macroValue, { color: theme.colors.onSurface }]}>{nutritionTotals.protein}</Text>
+                <Text style={[styles.macroUnit, { color: theme.colors.onSurfaceVariant }]}>g</Text>
               </View>
               <ProgressBar 
                 progress={Math.min(nutritionTotals.protein / dailyGoals.protein, 1)} 
-                color={colors.success} 
-                style={styles.macroProgressBar}
+                color={iconColors.success} 
+                style={[styles.macroProgressBar, { backgroundColor: theme.colors.surfaceVariant }]}
               />
             </View>
             
             <View style={styles.macroItem}>
-              <Text style={styles.macroLabel}>Carbs</Text>
+              <Text style={[styles.macroLabel, { color: theme.colors.onSurface }]}>Carbs</Text>
               <View style={styles.macroValueContainer}>
-                <Text style={styles.macroValue}>{nutritionTotals.carbs}</Text>
-                <Text style={styles.macroUnit}>g</Text>
+                <Text style={[styles.macroValue, { color: theme.colors.onSurface }]}>{nutritionTotals.carbs}</Text>
+                <Text style={[styles.macroUnit, { color: theme.colors.onSurfaceVariant }]}>g</Text>
               </View>
               <ProgressBar 
                 progress={Math.min(nutritionTotals.carbs / dailyGoals.carbs, 1)} 
-                color={colors.warning} 
-                style={styles.macroProgressBar}
+                color={iconColors.warning} 
+                style={[styles.macroProgressBar, { backgroundColor: theme.colors.surfaceVariant }]}
               />
             </View>
             
             <View style={styles.macroItem}>
-              <Text style={styles.macroLabel}>Fats</Text>
+              <Text style={[styles.macroLabel, { color: theme.colors.onSurface }]}>Fats</Text>
               <View style={styles.macroValueContainer}>
-                <Text style={styles.macroValue}>{nutritionTotals.fat}</Text>
-                <Text style={styles.macroUnit}>g</Text>
+                <Text style={[styles.macroValue, { color: theme.colors.onSurface }]}>{nutritionTotals.fat}</Text>
+                <Text style={[styles.macroUnit, { color: theme.colors.onSurfaceVariant }]}>g</Text>
               </View>
               <ProgressBar 
                 progress={Math.min(nutritionTotals.fat / dailyGoals.fat, 1)} 
-                color={colors.error} 
-                style={styles.macroProgressBar}
+                color={iconColors.error} 
+                style={[styles.macroProgressBar, { backgroundColor: theme.colors.surfaceVariant }]}
               />
             </View>
           </View>
@@ -244,7 +263,8 @@ const DashboardScreen: React.FC = () => {
           <Button 
             mode="outlined" 
             onPress={handleLogFood}
-            style={styles.outlineButton}
+            style={[styles.outlineButton, { borderColor: theme.colors.primary }]}
+            textColor={theme.colors.primary}
             icon="food-apple"
           >
             Log Food
@@ -252,37 +272,38 @@ const DashboardScreen: React.FC = () => {
         </Card.Content>
       </Card>
       
-      {/* Progress Highlights */}
-      <Card style={styles.card}>
+      {/* Progress Highlights Card */}
+      <Card style={[styles.card, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
         <Card.Content>
-          <Text style={styles.cardTitle}>Progress Highlights</Text>
+          <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>Progress Highlights</Text>
           
           <View style={styles.highlightItem}>
             <View style={styles.highlightIconContainer}>
-              <MaterialCommunityIcons name="trending-up" size={24} color={colors.success} />
+              <MaterialCommunityIcons name="trending-up" size={24} color={iconColors.success} />
             </View>
             <View style={styles.highlightContent}>
-              <Text style={styles.highlightTitle}>Bench Press Improvement</Text>
-              <Text style={styles.highlightDescription}>Up 10lbs since last month</Text>
+              <Text style={[styles.highlightTitle, { color: theme.colors.onSurface }]}>Bench Press Improvement</Text>
+              <Text style={[styles.highlightDescription, { color: theme.colors.onSurfaceVariant }]}>Up 10lbs since last month</Text>
             </View>
           </View>
           
-          <Divider style={styles.divider} />
+          <Divider style={[styles.divider, { backgroundColor: theme.colors.surfaceVariant }]} />
           
           <View style={styles.highlightItem}>
             <View style={styles.highlightIconContainer}>
-              <MaterialCommunityIcons name="trophy" size={24} color={colors.warning} />
+              <MaterialCommunityIcons name="trophy" size={24} color={iconColors.warning} />
             </View>
             <View style={styles.highlightContent}>
-              <Text style={styles.highlightTitle}>New Personal Record</Text>
-              <Text style={styles.highlightDescription}>Deadlift max: 225lbs</Text>
+              <Text style={[styles.highlightTitle, { color: theme.colors.onSurface }]}>New Personal Record</Text>
+              <Text style={[styles.highlightDescription, { color: theme.colors.onSurfaceVariant }]}>Deadlift max: 225lbs</Text>
             </View>
           </View>
           
           <Button 
             mode="outlined" 
             onPress={handleViewProgress}
-            style={styles.outlineButton}
+            style={[styles.outlineButton, { borderColor: theme.colors.primary }]}
+            textColor={theme.colors.primary}
             icon="chart-line"
           >
             View All Progress
@@ -332,7 +353,6 @@ function formatTimeAgo(date: Date): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
     padding: spacing.md,
   },
   welcomeSection: {
@@ -348,12 +368,10 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: fontSizes.xl,
     fontWeight: 'bold',
-    color: colors.text,
     marginBottom: spacing.xs,
   },
   welcomeMessage: {
     fontSize: fontSizes.md,
-    color: colors.textSecondary,
   },
   card: {
     marginBottom: spacing.lg,
@@ -364,7 +382,6 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     fontWeight: 'bold',
     marginBottom: spacing.md,
-    color: colors.text,
   },
   statsRow: {
     flexDirection: 'row',
@@ -378,11 +395,9 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.lg,
     fontWeight: 'bold',
     marginTop: spacing.xs,
-    color: colors.text,
   },
   statLabel: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
   },
   activeWorkoutHeader: {
     flexDirection: 'row',
@@ -392,23 +407,19 @@ const styles = StyleSheet.create({
   activeWorkoutTitle: {
     fontSize: fontSizes.md,
     fontWeight: 'bold',
-    color: colors.primary,
     marginLeft: spacing.xs,
   },
   workoutName: {
     fontSize: fontSizes.lg,
     fontWeight: 'bold',
     marginBottom: spacing.xs,
-    color: colors.text,
   },
   workoutDetails: {
     fontSize: fontSizes.sm,
-    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   noWorkoutText: {
     fontSize: fontSizes.md,
-    color: colors.textSecondary,
     marginBottom: spacing.md,
   },
   actionButton: {
@@ -416,7 +427,6 @@ const styles = StyleSheet.create({
   },
   outlineButton: {
     marginTop: spacing.md,
-    borderColor: colors.primary,
   },
   nutritionSection: {
     marginBottom: spacing.md,
@@ -428,12 +438,10 @@ const styles = StyleSheet.create({
   },
   nutritionLabel: {
     fontSize: fontSizes.md,
-    color: colors.text,
   },
   nutritionValue: {
     fontSize: fontSizes.md,
     fontWeight: 'bold',
-    color: colors.text,
   },
   progressBar: {
     height: 8,
@@ -450,7 +458,6 @@ const styles = StyleSheet.create({
   },
   macroLabel: {
     fontSize: fontSizes.sm,
-    color: colors.textSecondary,
     marginBottom: spacing.xs,
   },
   macroValueContainer: {
@@ -461,11 +468,9 @@ const styles = StyleSheet.create({
   macroValue: {
     fontSize: fontSizes.md,
     fontWeight: 'bold',
-    color: colors.text,
   },
   macroUnit: {
     fontSize: fontSizes.xs,
-    color: colors.textSecondary,
     marginLeft: 2,
   },
   macroProgressBar: {
@@ -481,7 +486,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.cardLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: spacing.md,
@@ -492,12 +496,10 @@ const styles = StyleSheet.create({
   highlightTitle: {
     fontSize: fontSizes.md,
     fontWeight: 'bold',
-    color: colors.text,
     marginBottom: 2,
   },
   highlightDescription: {
     fontSize: fontSizes.sm,
-    color: colors.textSecondary,
   },
   divider: {
     marginVertical: spacing.md,
