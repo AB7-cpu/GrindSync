@@ -74,7 +74,7 @@ The app integrates AI in several ways:
 
 ## Contributors
 
-- [Your Name](https://github.com/yourusername)
+- [Ayyub](https://github.com/AB7-cpu)
 
 ## License
 
